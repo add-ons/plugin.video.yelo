@@ -15,7 +15,10 @@ yelo_player = yelo.YeloPlay(kodi_wrapper, protocols.DASH)
 @routing.route('/')
 def main_menu():
     if yelo_player.login():
-        yelo_player.display_main_menu()
+        data = yelo_player.fetch_channel_list()
+        if data:
+            yelo_player.list_channels(data)
+        #yelo_player.display_main_menu()
 
 
 @routing.route('/listing/livestreams')
