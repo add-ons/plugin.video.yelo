@@ -309,7 +309,6 @@ class YeloPlay(Prepare, Errors):
                 listing.append((url, list_item, is_folder))
 
         self.kodi_wrapper.add_dir_items(listing)
-        self.kodi_wrapper.sort_method(SORT_METHOD_LABEL_IGNORE_THE)
         self.kodi_wrapper.end_directory()
 
     def show_info_stream(self, name, logo, channel, channel_id):
