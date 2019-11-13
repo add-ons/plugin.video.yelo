@@ -32,7 +32,7 @@ class KodiWrapper:
     def create_list_item(self, label, logo, fanart, extra_info = None, playable = "false"):
         list_item = xbmcgui.ListItem()
         list_item.setLabel(label)
-        list_item.setArt({'fanart': fanart, 'icon' : logo, 'thumb': logo})
+        list_item.setArt({'fanart': fanart, 'icon' : logo, 'thumb': fanart})
 
         info = {'title': label}
         if extra_info:
