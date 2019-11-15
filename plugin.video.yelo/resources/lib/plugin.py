@@ -18,22 +18,6 @@ def main_menu():
         data = yelo_player.fetch_channel_list()
         if data:
             yelo_player.list_channels(data)
-        #yelo_player.display_main_menu()
-
-
-@routing.route('/listing/livestreams')
-def list_channels():
-    data = yelo_player.fetch_channel_list()
-    if data:
-        yelo_player.list_channels(data)
-
-
-@routing.route('/info/<channel_name>/<logo>/<channel>/<channelId>')
-def channel_info(channel_name, logo, channel, channelId):
-    import base64
-
-    if channel_name and logo and channel:
-        yelo_player.show_info_stream(channel_name, base64.b64decode(logo), channel, channelId)
 
 
 @routing.route('/livestream/<channel>')

@@ -230,22 +230,6 @@ class YeloPlay(Prepare, Errors):
         self.streaming_protocol = streaming_protocol
         self.addon_url = kodiwrapper.get_addon_url()
 
-    def display_main_menu(self, is_folder=True):
-        listing = []
-        item = {
-            "name": "Livestreams",
-            "thumb": "DefaultAddonPVRClient.png"
-        }
-
-        list_item = self.kodi_wrapper.create_list_item(item["name"], item["thumb"], None, None, "false")
-
-        url = self.kodi_wrapper.url_for("list_channels", category=item["name"].lower())
-        listing.append((url, list_item, is_folder))
-
-        self.kodi_wrapper.add_dir_items(listing)
-        self.kodi_wrapper.sort_method(SORT_METHOD_LABEL_IGNORE_THE)
-        self.kodi_wrapper.end_directory()
-
     def _request_broadcast_info(self, channelId, datetime):
         r = make_request(self.session, "GET", "https://pubba.yelo.prd.telenet-ops.be/v1/"
                                               "events/schedule-time/outformat/json/lng/nl/start/"
@@ -292,36 +276,15 @@ class YeloPlay(Prepare, Errors):
                 liveThumbnailURL = tv_channels[i]["channelProperties"]["liveThumbnailURL"]
                 stbUniqueName = tv_channels[i]["channelIdentification"]["stbUniqueName"]
                 channelId = tv_channels[i]["channelIdentification"]["channelId"]
-
+                currently_playing, poster = self.get_current_program_playing(channelId)
                 list_item = self.kodi_wrapper.\
                     create_list_item(name if sys.version_info[0] == 3 else name.encode('utf-8'),
-                                     squareLogo, liveThumbnailURL, {"plot": name})
+                                     squareLogo, liveThumbnailURL, {"plot": currently_playing}, "true")
 
-                import base64
-                url = self.kodi_wrapper.url_for(
-                    "channel_info",
-                    channel_name=name,
-                    logo=base64.b64encode(squareLogo),
-                    channel=stbUniqueName,
-                    channelId=str(channelId)
-                )
+                url = self.kodi_wrapper.url_for("play_livestream", channel=stbUniqueName)
 
-                listing.append((url, list_item, is_folder))
+                self.kodi_wrapper.add_dir_item(url, list_item, 1)
 
-        self.kodi_wrapper.add_dir_items(listing)
-        self.kodi_wrapper.end_directory()
-
-    def show_info_stream(self, name, logo, channel, channel_id):
-        currently_playing, poster = self.get_current_program_playing(channel_id)
-
-        list_item = self.kodi_wrapper. \
-            create_list_item(name, logo, poster,
-                             {"plot": currently_playing if currently_playing else name }, "true")
-
-        url = self.kodi_wrapper.url_for("play_livestream", channel=channel)
-
-        self.kodi_wrapper.add_dir_item(url, list_item, 1)
-        self.kodi_wrapper.sort_method(SORT_METHOD_LABEL_IGNORE_THE)
         self.kodi_wrapper.end_directory()
 
     def play_live_stream(self, stream_url):
