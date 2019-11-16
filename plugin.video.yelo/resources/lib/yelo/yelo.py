@@ -7,6 +7,9 @@ from resources.lib.helpers.dynamic_headers import *
 from resources.lib.helpers.helpermethods import *
 from resources.lib.statics.static import *
 from resources.lib.helpers import helperclasses
+import json
+from tornado import gen, httpclient, ioloop, web
+import xbmc
 
 # region Python_check
 
@@ -226,30 +229,36 @@ class YeloPlay(Prepare, Errors):
     def __init__(self, kodiwrapper, streaming_protocol, testing=False):
         Prepare.__init__(self, testing, kodiwrapper)
         Errors.__init__(self, testing, kodiwrapper)
-
+        self.channel_schedules = {}
         self.streaming_protocol = streaming_protocol
         self.addon_url = kodiwrapper.get_addon_url()
+    
+    @gen.coroutine
+    def fetch(session, url):
+        request = httpclient.AsyncHTTPClient()
+        resp = yield request.fetch(url)
+        result = json.loads(resp.body.decode('utf-8'))
+        raise gen.Return(result)
 
-    def _request_broadcast_info(self, channelId, datetime):
-        r = make_request(self.session, "GET", "https://pubba.yelo.prd.telenet-ops.be/v1/"
-                                              "events/schedule-time/outformat/json/lng/nl/start/"
-                                              "{}/range/{}/channel/{}/".
-                              format(datetime, 1, channelId),
-                              default_headers, None, None, False, None, self.testing)
+    @gen.coroutine
+    def fetch_channels_schedules(self, channels):
+        datetime = datetime.today().strftime("%Y%m%d%H")
+        futures_list = []
+        channels_schedules = []
+        for channel in channels:
+            url = "https://pubba.yelo.prd.telenet-ops.be/v1/events/schedule-time/outformat/json/lng/nl/start/{}/range/{}/channel/{}/".format(datetime, 1, channelId)
+            futures_list.append(fetch(session, url))
+        yield futures_list
+        for x in futures_list:
+            schedules = x.result().json()["schedule"]
+            channelId = schedules[0].channelid
+            self.channels_schedules[channelId] = [(broadcast_elem["title"], broadcast_elem["starttime"], broadcast_elem["endtime"],
+                    broadcast_elem["poster"])
+                    for schedule_elem in schedules for broadcast_elem in schedule_elem["broadcast"]]
+        return
 
-        schedules = r.json()["schedule"]
-
-        return [(broadcast_elem["title"], broadcast_elem["starttime"], broadcast_elem["endtime"],
-                 broadcast_elem["poster"])
-                for schedule_elem in schedules for broadcast_elem in schedule_elem["broadcast"]]
-
-    def _get_broadcast_now(self, channelId):
-        today = datetime.today().strftime("%Y%m%d%H")
-        return self._request_broadcast_info(channelId, today)
-
-    def get_current_program_playing(self, channelId):
+    def get_current_program_playing(self, schedule):
         timestamp = get_timestamp()
-        schedule = self._get_broadcast_now(channelId)
 
         if schedule:
             query = [(x[0], x[3]) for x in schedule if timestamp >= int(x[1]) and timestamp <= int(x[2])]
@@ -260,8 +269,20 @@ class YeloPlay(Prepare, Errors):
         return "", ""
 
     def list_channels(self, tv_channels, is_folder=True):
+        import web_pdb; web_pdb.set_trace()
         listing = []
         entitlementId = self.fetch_from_data("entitlement")["entitlementId"]
+        channels = []
+        for j in range(len(tv_channels)):
+            if (
+                    not bool(tv_channels[j]["channelProperties"]["radio"])
+                    and bool(tv_channels[j]["channelProperties"]["live"])
+                    and any(tv_channels[j]["channelPolicies"]["linearEndpoints"])
+                    and any(x in entitlementId for x in tv_channels[j]["channelAvailability"]["oasisId"])
+            ):
+                channels.append(tv_channels[j]["channelIdentification"]["channelId"])
+
+        self.channels_schedules = yield self.fetch_channels_schedules(channels)
 
         for i in range(len(tv_channels)):
             if (
@@ -276,15 +297,14 @@ class YeloPlay(Prepare, Errors):
                 liveThumbnailURL = tv_channels[i]["channelProperties"]["liveThumbnailURL"]
                 stbUniqueName = tv_channels[i]["channelIdentification"]["stbUniqueName"]
                 channelId = tv_channels[i]["channelIdentification"]["channelId"]
-                currently_playing, poster = self.get_current_program_playing(channelId)
+                currently_playing, poster = self.get_current_program_playing(self.channel_schedules[channelId])
+                xbmc.log("YELO TV - CHANNEL {} - {}".format(channelId, currently_playing))
                 list_item = self.kodi_wrapper.\
                     create_list_item(name if sys.version_info[0] == 3 else name.encode('utf-8'),
                                      squareLogo, liveThumbnailURL, {"plot": currently_playing}, "true")
-
                 url = self.kodi_wrapper.url_for("play_livestream", channel=stbUniqueName)
-
                 self.kodi_wrapper.add_dir_item(url, list_item, 1)
-
+        
         self.kodi_wrapper.end_directory()
 
     def play_live_stream(self, stream_url):
