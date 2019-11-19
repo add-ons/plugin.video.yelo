@@ -8,10 +8,7 @@ from resources.lib.helpers.helpermethods import *
 from resources.lib.statics.static import *
 from resources.lib.helpers import helperclasses
 import json
-from tornado import gen, httpclient, ioloop, web
-import xbmc
-import ptvsd
-ptvsd.enable_attach("")
+from threading import Thread
 
 # region Python_check
 
@@ -234,49 +231,46 @@ class YeloPlay(Prepare, Errors):
         self.channel_schedules = {}
         self.streaming_protocol = streaming_protocol
         self.addon_url = kodiwrapper.get_addon_url()
-        xbmc.log("YELO INIT",xbmc.LOGWARNING)
-
     
-    @gen.coroutine
-    def fetch(session, url):
-        xbmc.log("YELO Fetching {}".format(url))
-        request = httpclient.AsyncHTTPClient()
-        resp = yield request.fetch(url)
-        result = json.loads(resp.body.decode('utf-8'))
-        raise gen.Return(result)
+    def fetch(self, session, datetime, channelId, schedules, index):
+        r = make_request(session, "GET", "https://pubba.yelo.prd.telenet-ops.be/v1/events/schedule-time/outformat/json/lng/nl/start/{}/range/{}/channel/{}/".format(datetime, 1, channelId),
+                         default_headers,
+                         None, None, False, None, self.testing)
 
-    @gen.coroutine
+        schedules[index] = r.json()["schedule"][0]
+
     def fetch_channels_schedules(self, channels):
-        xbmc.log("YELO Fetching all channels {}".format(str(channels)),xbmc.LOGWARNING)
-        datetime = datetime.today().strftime("%Y%m%d%H")
-        futures_list = []
+        dateTime = datetime.today().strftime("%Y%m%d%H")
         channels_schedules = []
-        for channel in channels:
-            url = "https://pubba.yelo.prd.telenet-ops.be/v1/events/schedule-time/outformat/json/lng/nl/start/{}/range/{}/channel/{}/".format(datetime, 1, channelId)
-            futures_list.append(fetch(session, url))
-        yield futures_list
-        for x in futures_list:
-            schedules = x.result().json()["schedule"]
-            channelId = schedules[0].channelid
-            self.channels_schedules[channelId] = [(broadcast_elem["title"], broadcast_elem["starttime"], broadcast_elem["endtime"],
-                    broadcast_elem["poster"])
-                    for schedule_elem in schedules for broadcast_elem in schedule_elem["broadcast"]]
-        return
+        threads = [None] * len(channels)
+        schedules = [None] * len(channels)
+        
+        for i in range(len(threads)):
+            threads[i] = Thread(target=self.fetch, args=(self.session, dateTime, channels[i], schedules, i))
+            threads[i].start()
 
-    def get_current_program_playing(self, schedule):
+        for i in range(len(threads)):
+            threads[i].join()
+
+        return [
+            {
+             "channelId": schedule_elem['channelid'],
+             "title": broadcast_elem["title"],
+             "start": broadcast_elem["starttime"],
+             "end": broadcast_elem["endtime"],
+             "poster": broadcast_elem["poster"]
+            }
+            for schedule_elem in schedules for broadcast_elem in schedule_elem["broadcast"]]                
+
+    def get_current_program_playing(self, schedule, channelId):
         timestamp = get_timestamp()
 
         if schedule:
-            query = [(x[0], x[3]) for x in schedule if timestamp >= int(x[1]) and timestamp <= int(x[2])]
-
-            if query:
-                return query[0]
-
-        return "", ""
+            onNow = next((x for x in schedule if x['channelId'] == channelId and timestamp >= int(x['start']) and timestamp <= int(x['end'])), None)
+            return onNow['title']
+        return ""
 
     def list_channels(self, tv_channels, is_folder=True):
-        ptvsd.break_into_debugger() 
-        xbmc.log("YELO Listing channels",xbmc.LOGWARNING)
         listing = []
         entitlementId = self.fetch_from_data("entitlement")["entitlementId"]
         channels = []
@@ -288,10 +282,8 @@ class YeloPlay(Prepare, Errors):
                     and any(x in entitlementId for x in tv_channels[j]["channelAvailability"]["oasisId"])
             ):
                 channels.append(tv_channels[j]["channelIdentification"]["channelId"])
-
-        xbmc.log("YELO found {} channels".format(len(channels)),xbmc.LOGWARNING)
         
-        yield self.fetch_channels_schedules(channels)
+        channels_schedules = self.fetch_channels_schedules(channels)
 
         for i in range(len(tv_channels)):
             if (
@@ -306,9 +298,7 @@ class YeloPlay(Prepare, Errors):
                 liveThumbnailURL = tv_channels[i]["channelProperties"]["liveThumbnailURL"]
                 stbUniqueName = tv_channels[i]["channelIdentification"]["stbUniqueName"]
                 channelId = tv_channels[i]["channelIdentification"]["channelId"]
-                #currently_playing, poster = self.get_current_program_playing(self.channel_schedules[channelId])
-                #xbmc.log("YELO TV - CHANNEL {} - {}".format(channelId, currently_playing))
-                currently_playing = ""
+                currently_playing = self.get_current_program_playing(channels_schedules, channelId)
                 list_item = self.kodi_wrapper.\
                     create_list_item(name if sys.version_info[0] == 3 else name.encode('utf-8'),
                                      squareLogo, liveThumbnailURL, {"plot": currently_playing}, "true")
