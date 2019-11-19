@@ -10,6 +10,8 @@ from resources.lib.helpers import helperclasses
 import json
 from tornado import gen, httpclient, ioloop, web
 import xbmc
+import ptvsd
+ptvsd.enable_attach("")
 
 # region Python_check
 
@@ -232,9 +234,12 @@ class YeloPlay(Prepare, Errors):
         self.channel_schedules = {}
         self.streaming_protocol = streaming_protocol
         self.addon_url = kodiwrapper.get_addon_url()
+        xbmc.log("YELO INIT",xbmc.LOGWARNING)
+
     
     @gen.coroutine
     def fetch(session, url):
+        xbmc.log("YELO Fetching {}".format(url))
         request = httpclient.AsyncHTTPClient()
         resp = yield request.fetch(url)
         result = json.loads(resp.body.decode('utf-8'))
@@ -242,6 +247,7 @@ class YeloPlay(Prepare, Errors):
 
     @gen.coroutine
     def fetch_channels_schedules(self, channels):
+        xbmc.log("YELO Fetching all channels {}".format(str(channels)),xbmc.LOGWARNING)
         datetime = datetime.today().strftime("%Y%m%d%H")
         futures_list = []
         channels_schedules = []
@@ -269,7 +275,8 @@ class YeloPlay(Prepare, Errors):
         return "", ""
 
     def list_channels(self, tv_channels, is_folder=True):
-        import web_pdb; web_pdb.set_trace()
+        ptvsd.break_into_debugger() 
+        xbmc.log("YELO Listing channels",xbmc.LOGWARNING)
         listing = []
         entitlementId = self.fetch_from_data("entitlement")["entitlementId"]
         channels = []
@@ -282,7 +289,9 @@ class YeloPlay(Prepare, Errors):
             ):
                 channels.append(tv_channels[j]["channelIdentification"]["channelId"])
 
-        self.channels_schedules = yield self.fetch_channels_schedules(channels)
+        xbmc.log("YELO found {} channels".format(len(channels)),xbmc.LOGWARNING)
+        
+        yield self.fetch_channels_schedules(channels)
 
         for i in range(len(tv_channels)):
             if (
@@ -297,8 +306,9 @@ class YeloPlay(Prepare, Errors):
                 liveThumbnailURL = tv_channels[i]["channelProperties"]["liveThumbnailURL"]
                 stbUniqueName = tv_channels[i]["channelIdentification"]["stbUniqueName"]
                 channelId = tv_channels[i]["channelIdentification"]["channelId"]
-                currently_playing, poster = self.get_current_program_playing(self.channel_schedules[channelId])
-                xbmc.log("YELO TV - CHANNEL {} - {}".format(channelId, currently_playing))
+                #currently_playing, poster = self.get_current_program_playing(self.channel_schedules[channelId])
+                #xbmc.log("YELO TV - CHANNEL {} - {}".format(channelId, currently_playing))
+                currently_playing = ""
                 list_item = self.kodi_wrapper.\
                     create_list_item(name if sys.version_info[0] == 3 else name.encode('utf-8'),
                                      squareLogo, liveThumbnailURL, {"plot": currently_playing}, "true")

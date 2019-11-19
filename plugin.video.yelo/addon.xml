@@ -8,7 +8,7 @@
         <import addon="script.module.future" version="0.17.1" />
         <import addon="script.module.kodi-six" version="0.1.0" />
         <import addon="script.module.tornado" version="5.1.1" />
-        <import addon="script.module.web-pdb" />
+        <import addon="script.module.ptvsd" />
     </requires>
     <extension point="xbmc.python.pluginsource" library="main.py">
         <provides>video</provides>
