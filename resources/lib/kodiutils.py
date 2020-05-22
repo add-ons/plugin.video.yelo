@@ -31,19 +31,19 @@ def set_setting(setting, value):
 
 
 def get_setting_as_bool(setting):
-    ADDON.getSettingBool(setting)
+    return get_setting(setting).lower() == "true"
 
 
 def get_setting_as_float(setting):
     try:
-        return ADDON.getSettingNumber(setting)
+        return float(get_setting(setting))
     except ValueError:
         return 0
 
 
 def get_setting_as_int(setting):
     try:
-        return ADDON.getSettingInt(setting)
+        return int(get_setting_as_float(setting))
     except ValueError:
         return 0
 

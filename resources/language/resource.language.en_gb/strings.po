@@ -48,18 +48,6 @@ msgctxt "#32007"
 msgid "Please check your login details."
 msgstr "Please check your login details."
 
-msgctxt "#32008"
-msgid "Postal"
-msgstr "Postal"
-
-msgctxt "#32009"
-msgid "Please enter your postal code in settings."
-msgstr "Please enter your postal code in settings."
-
-msgctxt "#32010"
-msgid "Please enter your postal code in settings."
-msgstr "Please enter your postal code in settings."
-
 msgctxt "#32014"
 msgid "Login"
 msgstr "Login"

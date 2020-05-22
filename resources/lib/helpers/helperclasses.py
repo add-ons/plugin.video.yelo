@@ -1,31 +1,21 @@
+from xbmcaddon import Addon
+
+
 class Credentials:
-    def __init__(self, kodi_wrapper):
-        self._kodi_wrapper = kodi_wrapper
+    def __init__(self):
         self.reload()
 
     def are_filled_in(self):
-        return not (self.username is None or self.password is None or self.username == '' or self.password == '')
+        return not (self.username is None or self.password is None
+                    or self.username == '' or self.password == '')
 
     def reload(self):
-        self.username = self._kodi_wrapper.get_setting('username')
-        self.password = self._kodi_wrapper.get_setting('password')
+        self.username = Addon().getSetting('username')
+        self.password = Addon().getSetting('password')
 
-
-class PostalCode:
-    def __init__(self, kodi_wrapper):
-        self._kodi_wrapper = kodi_wrapper
-        self.reload()
-
-    def are_filled_in(self):
-        return False if int(self.postal_code) == 0 else True
-
-    def reload(self):
-        self.postal_code = self._kodi_wrapper.get_setting('postal')
-
-class BitRate:
-    def __init__(self, kodi_wrapper):
-        self._kodi_wrapper = kodi_wrapper
-        self.reload()
-
-    def reload(self):
-        self.bitrate = self._kodi_wrapper.get_setting('bitrate')
+class UA:
+    @classmethod
+    def UA(cls):
+        return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' \
+                                'AppleWebKit/537.36 (KHTML, like Gecko) ' \
+                                'Chrome/81.0.4044.138 Safari/537.36'

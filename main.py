@@ -1,4 +1,4 @@
-import sys
-from resources.lib import plugin
+from resources.lib import addon
+addon.run()
 
-plugin.run(sys.argv)
+
