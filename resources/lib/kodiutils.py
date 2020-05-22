@@ -3,7 +3,6 @@
 import xbmc
 import xbmcaddon
 import xbmcgui
-import sys
 import logging
 import json as json
 

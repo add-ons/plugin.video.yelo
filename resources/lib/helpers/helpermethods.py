@@ -71,7 +71,7 @@ def stream_payload(device_id, channel_id, protocol=PROTOCOLS.DASH):
 
 def widevine_payload_package(device_id, customer_id):
     import json
-    x = {
+    payload = {
         "LatensRegistration": {
             "CustomerName": "{}".format(customer_id),
             "AccountName": "PlayReadyAccount",
@@ -91,7 +91,7 @@ def widevine_payload_package(device_id, customer_id):
         "Payload": "b{SSM}"
     }
 
-    return json.dumps(x)
+    return json.dumps(payload)
 
 
 def authorization_payload(acces_token):
@@ -114,8 +114,8 @@ def is_in_cache(key):
     if not os.path.isfile(CACHE_FILE_NAME):
         return False
 
-    with open(CACHE_FILE_NAME, "r") as jsonFile:
-        data = json.load(jsonFile)
+    with open(CACHE_FILE_NAME, "r") as json_file:
+        data = json.load(json_file)
 
     return key in data
 
@@ -134,13 +134,13 @@ def cache_to_file(json_data):
 
     data = {}
     if os.path.isfile(CACHE_FILE_NAME):
-        with open(CACHE_FILE_NAME, "r") as jsonFile:
-            data = json.load(jsonFile)
+        with open(CACHE_FILE_NAME, "r") as json_file:
+            data = json.load(json_file)
 
     data.update(json_data)
 
-    with open(CACHE_FILE_NAME, "w") as jsonFile:
-        json.dump(data, jsonFile)
+    with open(CACHE_FILE_NAME, "w") as json_file:
+        json.dump(data, json_file)
 
 
 def get_from_cache(key):
@@ -155,8 +155,8 @@ def get_from_cache(key):
 
     os.chdir(path)
 
-    with open(CACHE_FILE_NAME, "r") as jsonFile:
-        data = json.load(jsonFile)
+    with open(CACHE_FILE_NAME, "r") as json_file:
+        data = json.load(json_file)
 
     return data[key]
 

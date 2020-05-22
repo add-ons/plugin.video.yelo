@@ -1,0 +1,20 @@
+# Temporary files
+*~
+.cache
+*.swp
+
+# Test caches
+*.py[cod]
+/.coverage
+/.pytest_cache/
+/.tox/
+
+# Packages
+*.zip
+
+# Logs
+kodi-addon-checker.log
+kodi-addon-checker-report.log
+
+# Userdata
+tests/userdata/credentials.json
