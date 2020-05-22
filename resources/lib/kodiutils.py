@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
+# GNU General Public License v3.0 (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+from __future__ import absolute_import, division, unicode_literals
+import json
+import logging
 import xbmc
 import xbmcaddon
 import xbmcgui
-import sys
-import logging
-import json as json
-
 
 # read settings
 ADDON = xbmcaddon.Addon()
 
-logger = logging.getLogger(__name__)
+logging.basicConfig()
+_LOGGER = logging.getLogger(__name__)
 
 
 def notification(header, message, time=5000, icon=ADDON.getAddonInfo('icon'), sound=True):
@@ -61,11 +62,8 @@ def kodi_json_request(params):
     except UnicodeDecodeError:
         response = json.loads(request.decode('utf-8', 'ignore'))
 
-    try:
-        if 'result' in response:
-            return response['result']
-        return None
-    except KeyError:
-        logger.warn("[%s] %s" %
-                    (params['method'], response['error']['message']))
-        return None
+    result = response.get('result')
+    if result is None:
+        _LOGGER.debug("[%s] %s", params['method'], response['error']['message'])
+
+    return result

@@ -1,21 +1,21 @@
+# -*- coding: utf-8 -*-
+# GNU General Public License v3.0 (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import absolute_import, division, unicode_literals
 import sys
+from xbmcaddon import Addon
 import xbmc
 import xbmcgui
 import xbmcplugin
-from xbmcaddon import Addon
 
 
-class KodiWrapper():
-    __handle__ = int(sys.argv[1])
-
+class KodiWrapper():  # pylint: disable=no-init
     @classmethod
     def get_addon_data_path(cls):
-        global profile
         if sys.version_info[0] == 3:
             profile = xbmc.translatePath(Addon().getAddonInfo('profile'))
         else:
             profile = xbmc.translatePath(Addon().getAddonInfo('profile')).decode("utf-8")
-
         return profile
 
     @classmethod
@@ -28,8 +28,7 @@ class KodiWrapper():
         return Addon().getLocalizedString(number)
 
     @classmethod
-    def create_list_item(cls, label, logo, fanart, extra_info = None, playable = False,
-                         refresh_item=False):
+    def create_list_item(cls, label, logo, fanart, extra_info=None, playable=False, refresh_item=False):
 
         playable = "true" if playable else "false"
 
@@ -51,23 +50,24 @@ class KodiWrapper():
 
     @classmethod
     def url_for(cls, name, *args, **kwargs):
-        import resources.lib.addon
-        return resources.lib.addon.plugin.url_for(getattr(resources.lib.addon, name), *args, **kwargs)
+        import addon
+        return addon.plugin.url_for(getattr(addon, name), *args, **kwargs)
 
     @classmethod
     def add_dir_items(cls, listing):
-        xbmcplugin.addDirectoryItems(cls.__handle__, listing, len(listing))
+        from addon import plugin
+        xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
 
     @classmethod
     def end_directory(cls):
-        xbmcplugin.endOfDirectory(cls.__handle__)
+        from addon import plugin
+        xbmcplugin.endOfDirectory(plugin.handle)
 
     @classmethod
     def sort_method(cls, sort_method):
-        xbmcplugin.addSortMethod(cls.__handle__, sort_method)
-
+        from addon import plugin
+        xbmcplugin.addSortMethod(plugin.handle, sort_method)
 
     @classmethod
     def open_settings(cls):
         Addon().openSettings()
-

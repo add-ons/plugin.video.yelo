@@ -1,4 +1,8 @@
-from resources.lib.enums.enums import PROTOCOLS
+# -*- coding: utf-8 -*-
+# GNU General Public License v3.0 (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import absolute_import, division, unicode_literals
+from data import PROTOCOLS
 
 CACHE_FILE_NAME = "data.json"
 
@@ -21,7 +25,6 @@ def login_payload(username, password):
 
 def oauth_refresh_token_payload(refresh_token, callback_url):
     import json
-
     refresh_token_payload = {
         "OAuthTokenParamsRequest":
             {
@@ -35,43 +38,60 @@ def oauth_refresh_token_payload(refresh_token, callback_url):
 
 def oauth_payload(auth_token, callback_url):
     import json
-    oauth = {"OAuthTokenParamsRequest":
-                 {"authToken": auth_token,
-                  "redirectUrl": callback_url}}
-
+    oauth = dict(
+        OAuthTokenParamsRequest=dict(
+            authToken=auth_token,
+            redirectUrl=callback_url,
+        ),
+    )
     return json.dumps(oauth)
 
 
 def device_payload():
     import json
-    registration = {"deviceRegistration":
-                        {"deviceProperties":
-                             {"dict": [{"value": "Web", "key": "DEVICE_OS"},
-                                       {"value": "Windows", "key": "OS_NAME"},
-                                       {"value": "10", "key": "OS_VERSION"},
-                                       {"value": "Firefox", "key": "BROWSER_NAME"},
-                                       {"value": "63.0", "key": "BROWSER_VERSION"},
-                                       {"value": "1920x1080", "key": "SCREEN_RESOLUTION"},
-                                       {"value": "1", "key": "SCREEN_DENSITY"},
-                                       {"value": "desktop", "key": "DEVICE_TYPE"}]}}}
-
+    registration = dict(
+        deviceRegistration=dict(
+            deviceProperties=dict(
+                dict=[
+                    dict(key='DEVICE_OS', value='Web'),
+                    dict(key='OS_NAME', value='Windows'),
+                    dict(key='OS_VERSION', value='10'),
+                    dict(key='BROWSER_NAME', value='Firefox'),
+                    dict(key='BROWSER_VERSION', value='63.0'),
+                    dict(key='SCREEN_RESOLUTION', value='1920x1080'),
+                    dict(key='SCREEN_DENSITY', value='1'),
+                    dict(key='DEVICE_TYPE', value='desktop'),
+                ],
+            ),
+        ),
+    )
     return json.dumps(registration)
 
 
 def stream_payload(device_id, channel_id, protocol=PROTOCOLS.DASH):
     import json
-    stream = {"stream":
-                  {"protocol": protocol, "drmMethod": "WIDEVINE", "platform": "Web",
-                   "deviceId": device_id, "context": "Watch-TV",
-                   "resource": {"watchMode": "Live", "links": {"tvChannel": channel_id},
-                                "timeShiftOffset": 0}}}
-
+    stream = dict(
+        stream=dict(
+            protocol=protocol,
+            drmMethod='WIDEVINE',
+            platform='Web',
+            deviceId=device_id,
+            context='Watch-TV',
+            resource=dict(
+                watchMode='Live',
+                links=dict(
+                    tvChannel=channel_id,
+                ),
+                timeShiftOffset=0,
+            )
+        )
+    )
     return json.dumps(stream)
 
 
 def widevine_payload_package(device_id, customer_id):
     import json
-    x = {
+    payload = {
         "LatensRegistration": {
             "CustomerName": "{}".format(customer_id),
             "AccountName": "PlayReadyAccount",
@@ -91,79 +111,67 @@ def widevine_payload_package(device_id, customer_id):
         "Payload": "b{SSM}"
     }
 
-    return json.dumps(x)
+    return json.dumps(payload)
 
 
 def authorization_payload(acces_token):
-    return "Bearer " \
-           "{}".format(acces_token)
+    return "Bearer {}".format(acces_token)
 
 
 def is_in_cache(key):
     import json
     import os
-    from resources.lib.kodiwrapper import KodiWrapper
+    from kodiwrapper import KodiWrapper
 
     path = KodiWrapper.get_addon_data_path()
 
-    if not os.path.exists(path):
-        os.mkdir(path, 0o775)
-
-    os.chdir(path)
-
-    if not os.path.isfile(CACHE_FILE_NAME):
+    if not os.path.isfile(os.path.join(path, CACHE_FILE_NAME)):
         return False
 
-    with open(CACHE_FILE_NAME, "r") as jsonFile:
-        data = json.load(jsonFile)
+    with open(os.path.join(path, CACHE_FILE_NAME), "r") as json_file:
+        data = json.load(json_file)
 
     return key in data
 
 
 def cache_to_file(json_data):
-    import os
     import json
-    from resources.lib.kodiwrapper import KodiWrapper
+    import os
+    from kodiwrapper import KodiWrapper
 
     path = KodiWrapper.get_addon_data_path()
 
     if not os.path.exists(path):
         os.mkdir(path, 0o775)
 
-    os.chdir(path)
-
     data = {}
-    if os.path.isfile(CACHE_FILE_NAME):
-        with open(CACHE_FILE_NAME, "r") as jsonFile:
-            data = json.load(jsonFile)
+    if os.path.isfile(os.path.join(path, CACHE_FILE_NAME)):
+        with open(os.path.join(path, CACHE_FILE_NAME), "r") as json_file:
+            data = json.load(json_file)
 
     data.update(json_data)
 
-    with open(CACHE_FILE_NAME, "w") as jsonFile:
-        json.dump(data, jsonFile)
+    with open(os.path.join(path, CACHE_FILE_NAME), "w") as json_file:
+        json.dump(data, json_file)
 
 
 def get_from_cache(key):
     import json
     import os
-    from resources.lib.kodiwrapper import KodiWrapper
+    from kodiwrapper import KodiWrapper
 
     path = KodiWrapper.get_addon_data_path()
 
-    if not os.path.exists(path):
-        os.mkdir(path, 0o775)
+    with open(os.path.join(path, CACHE_FILE_NAME), "r") as json_file:
+        data = json.load(json_file)
 
-    os.chdir(path)
-
-    with open(CACHE_FILE_NAME, "r") as jsonFile:
-        data = json.load(jsonFile)
-
-    return data[key]
+    return data.get(key)
 
 
 def create_token(size):
     import uuid
     return str(uuid.uuid4()).replace("-", "")[0:size]
+
 
 def timestamp_to_datetime(timestamp):
     from datetime import datetime

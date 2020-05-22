@@ -2,14 +2,12 @@
 <addon id="plugin.video.yelo" name="Yelo" version="1.0.0" provider-name="shycoderX">
     <requires>
         <import addon="xbmc.python" version="2.26.0"/>
+        <import addon="script.module.dateutil" version="2.4.2"/>
         <import addon="script.module.inputstreamhelper" version="0.3.4"/>
         <import addon="script.module.requests" version="2.18.0"/>
         <import addon="script.module.routing" version="0.2.3"/>
-        <import addon="script.module.future" version="0.17.1" />
-        <import addon="script.module.kodi-six" version="0.1.0" />
-        <import addon="script.module.dateutil" version="2.4.2"/>
     </requires>
-    <extension point="xbmc.python.pluginsource" library="main.py">
+    <extension point="xbmc.python.pluginsource" library="resources/lib/addon_entry.py">
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
@@ -27,7 +25,7 @@
         <platform>all</platform>
         <license>GNU General Public License, v3</license>
         <email>shycoderX@protonmail.com</email>
-        <source>https://github.com/shycoderX/repo-plugins/tree/leia/plugin.video.yelo</source>
+        <source>https://github.com/add-ons/plugin.video.yelo</source>
         <assets>
             <icon>resources/icon.png</icon>
             <fanart>resources/fanart.jpg</fanart>

@@ -1,0 +1,17 @@
+{
+    "inputstream.adaptive": {
+        "DECRYPTERPATH": "special://home/cdm"
+    },
+    "plugin.video.yelo": {
+        "_comment": "do-not-add-username-and-password-here", 
+        "iptv.channels_uri": "plugin://plugin.video.yelo/iptv/channels", 
+        "iptv.enabled": "true", 
+        "iptv.epg_uri": "plugin://plugin.video.yelo/iptv/epg", 
+        "password": "", 
+        "username": ""
+    },
+    "script.module.inputstreamhelper": {
+        "last_update": 0.0,
+        "version": ""
+    }
+}
