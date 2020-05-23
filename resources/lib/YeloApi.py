@@ -253,9 +253,9 @@ class YeloApi(object):
                         "id": channel_id,
                         "start": timestamp_to_datetime(broadcast["starttime"]),
                         "stop": timestamp_to_datetime(broadcast["endtime"]),
-                        "title": (broadcast["title"] or "").strip().replace("&", "en"),
-                        "description": (broadcast["shortdescription"] or "").strip().replace("&", "en"),
-                        "subtitle": broadcast["contentlabel"] or "",
+                        "title": (broadcast["title"] or ""),
+                        "description": (broadcast["shortdescription"] or ""),
+                        "subtitle": (broadcast["contentlabel"] or ""),
                         "image": broadcast["image"]
                     })
 
@@ -263,14 +263,13 @@ class YeloApi(object):
             except:
                 continue
 
-    def _epg(self):
+    def _epg(self, tv_channels):
         from threading import Thread
 
         dict_ref = {}
         threads = []
 
-        channels = self.get_channels()
-        channel_ids = [item["id"] for item in channels]
+        channel_ids = [item["id"] for item in tv_channels]
 
         for id in channel_ids:
             thread = Thread(target=self.__epg, args=(id, dict_ref))
@@ -283,8 +282,8 @@ class YeloApi(object):
 
         return dict_ref
 
-    def get_epg(self):
-        return self._epg()
+    def get_epg(self, tv_channels):
+        return self._epg(tv_channels)
 
     def _create_guide_from_channel_info(self, prev, now, next):
         guide = ""

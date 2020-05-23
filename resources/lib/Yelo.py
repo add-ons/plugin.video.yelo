@@ -12,10 +12,8 @@ LICENSE_URL = 'https://lwvdrm.yelo.prd.telenet-ops.be/WvLicenseProxy'
 
 __handle__ = int(sys.argv[1])
 
-
 if sys.version_info[0] == 3:
     from urllib.parse import quote
-    from builtins import xrange as range
 else:
     from urllib import quote
 

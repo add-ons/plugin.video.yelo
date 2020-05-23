@@ -31,4 +31,5 @@ class IPTVManager:
         self.send(dict(version=1, streams=yelo_inst.get_channels_iptv()))
 
     def send_epg(self, yelo_inst):
-        self.send(dict(version=1, epg=yelo_inst.get_epg()))
+        tv_channels = yelo_inst.get_channels()
+        self.send(dict(version=1, epg=yelo_inst.get_epg(tv_channels)))
