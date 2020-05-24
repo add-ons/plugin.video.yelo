@@ -27,13 +27,13 @@ def play(uniqueName):
 def iptv_channels():
     from resources.lib.iptvmanager import IPTVManager
     port = int(plugin.args['port'][0])
-    IPTVManager(port).send_channels(yelo)
+    IPTVManager(port, yelo).send_channels()
 
 @plugin.route('/iptv/epg')
 def iptv_epg():
     from resources.lib.iptvmanager import IPTVManager
     port = int(plugin.args['port'][0])
-    IPTVManager(port).send_epg(yelo)
+    IPTVManager(port, yelo).send_epg()
 
 def run():
     plugin.run()

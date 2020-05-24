@@ -10,26 +10,35 @@ import json
 _LOGGER = logging.getLogger('iptv-manager')
 
 class IPTVManager:
-    """ Code related to the Kodi PVR integration """
+    """Interface to IPTV Manager"""
 
-    def __init__(self, port):
+    def __init__(self, port, yelo):
+        """Initialize IPTV Manager object"""
         self.port = port
+        self.yelo = yelo
 
+    def via_socket(func):  # pylint: disable=no-self-argument
+        """Send the output of the wrapped function to socket"""
 
-    def send(self, data):
-        """Decorator to send over a socket"""
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect(('127.0.0.1', self.port))
-        try:
-            sock.send(json.dumps(data)) # pylint: disable=not-callable
-        finally:
-            sock.close()
+        def send(self):
+            """Decorator to send over a socket"""
+            import json
+            import socket
+            _LOGGER.debug('Sending data output to IPTV Manager using port %s', self.port)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect(('127.0.0.1', self.port))
+            try:
+                sock.send(json.dumps(func(self)))  # pylint: disable=not-callable
+            finally:
+                sock.close()
 
+        return send
 
+    @via_socket
+    def send_channels(self):
+        return dict(version=1, streams=self.yelo.get_channels_iptv())
 
-    def send_channels(self, yelo_inst):
-        self.send(dict(version=1, streams=yelo_inst.get_channels_iptv()))
-
-    def send_epg(self, yelo_inst):
-        tv_channels = yelo_inst.get_channels()
-        self.send(dict(version=1, epg=yelo_inst.get_epg(tv_channels)))
+    @via_socket
+    def send_epg(self):
+        tv_channels = self.yelo.get_channels()
+        return dict(version=1, epg=self.yelo.get_epg(tv_channels))
