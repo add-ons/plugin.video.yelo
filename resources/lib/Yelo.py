@@ -45,8 +45,9 @@ class Yelo(YeloApi.YeloApi):
 
     def list_channels(self, is_folder=False):
         from resources.lib.kodiwrapper import KodiWrapper
-        import dateutil.parser
         import datetime
+        import dateutil.parser
+        from dateutil.tz import UTC
 
         listing = []
 
@@ -63,7 +64,7 @@ class Yelo(YeloApi.YeloApi):
 
             for index, item in enumerate(epg[name]):
                 try:
-                    now = datetime.datetime.utcnow().replace(second=0, microsecond=0)
+                    now = datetime.datetime.utcnow().replace(second=0, microsecond=0, tzinfo=UTC)
                     start = dateutil.parser.parse(item["start"])
                     end = dateutil.parser.parse(item["stop"])
 
