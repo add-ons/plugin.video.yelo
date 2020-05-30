@@ -264,7 +264,7 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
         resp = self.session.get("https://pubba.yelo.prd.telenet-ops.be/v1/"
                                 "events/schedule-day/outformat/json/lng/nl/channel/"
                                 "{}/day/{}/".format(channel_id, today))
-        return resp.json()
+        return resp.json()["schedule"]
 
     def _get_schedule_time(self, channel_id):
         from datetime import datetime
@@ -273,7 +273,7 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
         resp = self.session.get("https://pubba.yelo.prd.telenet-ops.be/v1/"
                                 "events/schedule-time/outformat/json/lng/nl/start/"
                                 "{}/range/{}/channel/{}/".format(today, 2, channel_id))
-        return resp.json()
+        return resp.json()["schedule"]
 
     def __epg(self, channel_id, dict_ref, full):
         sema.acquire()
@@ -285,10 +285,10 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
         else:
             data = self._get_schedule_time(channel_id)
 
-        channel_name = data["schedule"][0]["name"]
-        channel_id = data["schedule"][0]["channelid"]
+        channel_name = data[0]["name"]
+        channel_id = data[0]["channelid"]
 
-        for broadcast in data["schedule"][0]["broadcast"]:
+        for broadcast in data[0]["broadcast"]:
             channels.append(dict(
                 id=channel_id,
                 start=timestamp_to_datetime(broadcast.get('starttime')),
