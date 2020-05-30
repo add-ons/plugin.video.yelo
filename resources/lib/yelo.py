@@ -50,6 +50,25 @@ class Yelo(YeloApi):
             play_item.setProperty('inputstream.adaptive.license_flags', "persistent_storage")
             xbmcplugin.setResolvedUrl(plugin.handle, True, listitem=play_item)
 
+    def list_channels_no_epg(self, is_folder=False):
+        from kodiwrapper import KodiWrapper
+
+        listing = []
+
+        tv_channels = self.get_channels()
+
+        for tv_channel in tv_channels:
+            name = tv_channel.get('channelIdentification').get('name')
+            square_logo = tv_channel.get('channelProperties').get('squareLogo')
+            channel_id = tv_channel.get('channelIdentification').get('stbUniqueName')
+
+            list_item = KodiWrapper.create_list_item(name, square_logo, "", {"plot": ""}, True, True)
+            url = KodiWrapper.url_for('play_id', channel_id=channel_id)
+            listing.append((url, list_item, is_folder))
+
+        KodiWrapper.add_dir_items(listing)
+        KodiWrapper.end_directory()
+
     def list_channels(self, is_folder=False):
         from kodiwrapper import KodiWrapper
         import datetime

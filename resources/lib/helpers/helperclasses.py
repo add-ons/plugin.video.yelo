@@ -16,3 +16,15 @@ class Credentials:
     def reload(self):
         self.username = Addon().getSetting('username')
         self.password = Addon().getSetting('password')
+
+
+class EPG:
+    def __init__(self):
+        self.reload()
+
+    def is_enabled(self):
+        import json
+        return json.loads(self.epg.lower())
+
+    def reload(self):
+        self.epg = Addon().getSetting('epg')

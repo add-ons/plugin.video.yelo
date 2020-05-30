@@ -9,6 +9,10 @@
         <setting label="32002" type="text" id="password" default="" option="hidden"/>
     </category>
 
+    <category label="31998">
+        <setting label="31999" type="bool" id="epg" default="false"/>
+    </category>
+
     <category label="32016"> <!-- Expert -->
         <setting label="32017" type="action" id="ishelper_info" action="RunScript(script.module.inputstreamhelper, info)"/>
         <setting label="32018" type="action" id="adaptive_settings" option="close" action="Addon.OpenSettings(inputstream.adaptive)" visible="System.HasAddon(inputstream.adaptive) + [String.StartsWith(System.BuildVersion,18) | String.StartsWith(System.BuildVersion,19)]"/>

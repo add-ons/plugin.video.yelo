@@ -12,6 +12,12 @@ from kodiwrapper import KodiWrapper
 from yelo_errors import YeloErrors
 from yelo_exceptions import NotAuthorizedException, YeloException
 
+import threading
+import time
+
+maxthreads = 5
+sema = threading.Semaphore(value=maxthreads)
+
 try:  # Python 3
     from urllib.parse import quote
 except ImportError:  # Python 2
@@ -259,6 +265,8 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
         return channels
 
     def __epg(self, channel_id, dict_ref):
+        sema.acquire()
+
         channels = []
 
         data = self._get_schedule(channel_id)
@@ -277,16 +285,17 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
             ))
             dict_ref.update({channel_name: channels})
 
-    def _epg(self, tv_channels):
-        from threading import Thread
+        time.sleep(0.01)
+        sema.release()
 
+    def _epg(self, tv_channels):
         dict_ref = {}
         threads = []
 
         channel_ids = [item["id"] for item in tv_channels]
 
         for channel_id in channel_ids:
-            thread = Thread(target=self.__epg, args=(channel_id, dict_ref))
+            thread = threading.Thread(target=self.__epg, args=(channel_id, dict_ref))
             thread.start()
             threads.append(thread)
 

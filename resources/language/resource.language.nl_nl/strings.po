@@ -16,6 +16,14 @@ msgstr ""
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "#31998"
+msgid "EPG"
+msgstr "EPG"
+
+msgctxt "#31999"
+msgid "EPG (disabled is faster essentially slower devices)"
+msgstr "EPG (indien uit zal de lijst sneller laden)"
+
 msgctxt "#32000"
 msgid "Credentials"
 msgstr "Aanmeldgegevens"

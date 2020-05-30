@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, unicode_literals
 import logging
 import routing
 
+from helpers.helperclasses import EPG
 from yelo_exceptions import YeloException
 from yelo import Yelo
 
@@ -18,7 +19,10 @@ yelo = Yelo()  # pylint: disable=invalid-name
 
 @plugin.route('/')
 def main_menu():
-    yelo.list_channels()
+    if EPG().is_enabled():
+        yelo.list_channels()
+    else:
+        yelo.list_channels_no_epg()
 
 
 @plugin.route('/play/id/<channel_id>')

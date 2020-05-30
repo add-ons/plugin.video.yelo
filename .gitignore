@@ -19,3 +19,6 @@ kodi-addon-checker-report.log
 # Userdata
 tests/userdata/credentials.json
 tests/userdata/data.json
+
+# Pycharm
+.idea/
