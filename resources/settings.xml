@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-    <category visible="false">
-        <setting id="iptv.channels_uri" default="plugin://plugin.video.yelo/iptv/channels" visible="false"/>
-	    <setting type="bool" id="iptv.enabled" default="true" visible="false" />
-        <setting id="iptv.epg_uri" default="plugin://plugin.video.yelo/iptv/epg" visible="false"/>
-    </category>
+    <setting id="iptv.channels_uri" default="plugin://plugin.video.yelo/iptv/channels" visible="false"/>
+    <setting type="bool" id="iptv.enabled" default="true" visible="false" />
+    <setting id="iptv.epg_uri" default="plugin://plugin.video.yelo/iptv/epg" visible="false"/>
 
     <category label="32000">
         <setting label="32001" type="text" id="username" default=""/>
