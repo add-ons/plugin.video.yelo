@@ -33,14 +33,14 @@ def play_id(channel_id):
 def iptv_channels():
     from iptvmanager import IPTVManager
     port = int(plugin.args['port'][0])
-    IPTVManager(port).send_channels(yelo)
+    IPTVManager(port, yelo).send_channels()
 
 
 @plugin.route('/iptv/epg')
 def iptv_epg():
     from iptvmanager import IPTVManager
     port = int(plugin.args['port'][0])
-    IPTVManager(port).send_epg(yelo)
+    IPTVManager(port, yelo).send_epg()
 
 
 def run(argv):

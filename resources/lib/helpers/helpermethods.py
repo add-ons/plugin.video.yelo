@@ -175,4 +175,4 @@ def create_token(size):
 
 def timestamp_to_datetime(timestamp):
     from datetime import datetime
-    return datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%dT%H:%M:%S")
+    return datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%dT%H:%M:%SZ")
