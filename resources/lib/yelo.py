@@ -78,7 +78,7 @@ class Yelo(YeloApi):
         listing = []
 
         tv_channels = self.get_channels()
-        epg = self.get_epg(tv_channels)
+        epg = self.get_epg(tv_channels, full=False)
 
         for tv_channel in tv_channels:
             name = tv_channel.get('channelIdentification').get('name')

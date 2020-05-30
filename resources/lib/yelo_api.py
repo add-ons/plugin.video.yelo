@@ -6,8 +6,10 @@ import requests
 
 from data import USER_AGENT
 from helpers.helperclasses import Credentials
-from helpers.helpermethods import (authorization_payload, cache_to_file, create_token, device_payload, get_from_cache, is_in_cache,
-                                   login_payload, oauth_payload, oauth_refresh_token_payload, regex, stream_payload, timestamp_to_datetime)
+from helpers.helpermethods import (authorization_payload, cache_to_file, create_token, device_payload, get_from_cache,
+                                   is_in_cache,
+                                   login_payload, oauth_payload, oauth_refresh_token_payload, regex, stream_payload,
+                                   timestamp_to_datetime)
 from kodiwrapper import KodiWrapper
 from yelo_errors import YeloErrors
 from yelo_exceptions import NotAuthorizedException, YeloException
@@ -29,7 +31,7 @@ CALLBACK_URL = "https://www.yeloplay.be/openid/callback"
 
 class YeloApi(object):  # pylint: disable=useless-object-inheritance
     session = requests.Session()
-    # session.verify = False
+    session.verify = False
     session.headers['User-Agent'] = USER_AGENT
 
     def __init__(self):
@@ -199,15 +201,6 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
             raise YeloException('No manifest for channel %s' % channel)
         return manifest
 
-    def _get_schedule(self, channel_id):
-        from datetime import datetime
-
-        today = datetime.today().strftime("%Y-%m-%d")
-        resp = self.session.get("https://pubba.yelo.prd.telenet-ops.be/v1/"
-                                "events/schedule-day/outformat/json/lng/nl/channel/"
-                                "{}/day/{}/".format(channel_id, today))
-        return resp.json()
-
     def _get_entitlements(self):
         if not is_in_cache("entitlements"):
             res = self._customer_features()
@@ -264,12 +257,34 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
             ))
         return channels
 
-    def __epg(self, channel_id, dict_ref):
+    def _get_schedule(self, channel_id):
+        from datetime import datetime
+
+        today = datetime.today().strftime("%Y-%m-%d")
+        resp = self.session.get("https://pubba.yelo.prd.telenet-ops.be/v1/"
+                                "events/schedule-day/outformat/json/lng/nl/channel/"
+                                "{}/day/{}/".format(channel_id, today))
+        return resp.json()
+
+    def _get_schedule_time(self, channel_id):
+        from datetime import datetime
+
+        today = datetime.today().strftime("%Y%m%d%H")
+        resp = self.session.get("https://pubba.yelo.prd.telenet-ops.be/v1/"
+                                "events/schedule-time/outformat/json/lng/nl/start/"
+                                "{}/range/{}/channel/{}/".format(today, 2, channel_id))
+        return resp.json()
+
+    def __epg(self, channel_id, dict_ref, full):
         sema.acquire()
 
         channels = []
 
-        data = self._get_schedule(channel_id)
+        if full:
+            data = self._get_schedule(channel_id)
+        else:
+            data = self._get_schedule_time(channel_id)
+
         channel_name = data["schedule"][0]["name"]
         channel_id = data["schedule"][0]["channelid"]
 
@@ -288,14 +303,14 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
         time.sleep(0.01)
         sema.release()
 
-    def _epg(self, tv_channels):
+    def _epg(self, tv_channels, full):
         dict_ref = {}
         threads = []
 
         channel_ids = [item["id"] for item in tv_channels]
 
         for channel_id in channel_ids:
-            thread = threading.Thread(target=self.__epg, args=(channel_id, dict_ref))
+            thread = threading.Thread(target=self.__epg, args=(channel_id, dict_ref, full))
             thread.start()
             threads.append(thread)
 
@@ -305,8 +320,8 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
 
         return dict_ref
 
-    def get_epg(self, tv_channels):
-        return self._epg(tv_channels)
+    def get_epg(self, tv_channels, full=True):
+        return self._epg(tv_channels, full)
 
     @staticmethod
     def _create_guide_from_channel_info(previous, current, upcoming):
