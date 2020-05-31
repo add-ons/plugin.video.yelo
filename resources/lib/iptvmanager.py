@@ -22,8 +22,6 @@ class IPTVManager:
 
         def send(self):
             """Decorator to send over a socket"""
-            import json
-            import socket
             _LOGGER.debug('Sending data output to IPTV Manager using port %s', self.port)
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect(('127.0.0.1', self.port))

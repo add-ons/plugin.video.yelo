@@ -2,6 +2,8 @@
 # GNU General Public License v3.0 (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, unicode_literals
+import threading
+import time
 import requests
 
 from data import USER_AGENT
@@ -14,11 +16,6 @@ from kodiwrapper import KodiWrapper
 from yelo_errors import YeloErrors
 from yelo_exceptions import NotAuthorizedException, YeloException
 
-import threading
-import time
-
-maxthreads = 5
-sema = threading.Semaphore(value=maxthreads)
 
 try:  # Python 3
     from urllib.parse import quote
@@ -27,6 +24,9 @@ except ImportError:  # Python 2
 
 BASE_URL = "https://api.yeloplay.be/api/v1"
 CALLBACK_URL = "https://www.yeloplay.be/openid/callback"
+
+MAXTHREADS = 5
+SEMAPHORE = threading.Semaphore(value=MAXTHREADS)
 
 
 class YeloApi(object):  # pylint: disable=useless-object-inheritance
@@ -276,7 +276,7 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
         return resp.json()["schedule"]
 
     def __epg(self, channel_id, dict_ref, full):
-        sema.acquire()
+        SEMAPHORE.acquire()
 
         channels = []
 
@@ -301,7 +301,7 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
             dict_ref.update({channel_name: channels})
 
         time.sleep(0.01)
-        sema.release()
+        SEMAPHORE.release()
 
     def _epg(self, tv_channels, full):
         dict_ref = {}
