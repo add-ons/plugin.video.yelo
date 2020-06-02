@@ -1,3 +1,9 @@
+[![GitHub release](https://img.shields.io/github/release/add-ons/plugin.video.yelo.svg)](https://github.com/add-ons/plugin.video.yelo/releases)
+[![Build status](https://github.com/add-ons/plugin.video.yelo/workflows/CI/badge.svg)](https://github.com/add-ons/plugin.video.yelo/actions)
+[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-yellow.svg)](https://opensource.org/licenses/GPL-3.0)
+[![Contributors](https://img.shields.io/github/contributors/add-ons/plugin.video.yelo.svg)](https://github.com/add-ons/plugin.video.yelo/graphs/contributors)
+
+
 # Welcome #
 
 Please read the instructions below carefully.
