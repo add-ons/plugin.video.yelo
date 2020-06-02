@@ -40,13 +40,13 @@ jobs:
       env:
         ADDON_PASSWORD: ${{ secrets.ADDON_PASSWORD }}
         ADDON_USERNAME: ${{ secrets.ADDON_USERNAME }}
-      if: always()
-#    - name: Run addon using cli
-#      run: coverage run -a tests/run.py /
-#      env:
-#        ADDON_PASSWORD: ${{ secrets.ADDON_PASSWORD }}
-#        ADDON_USERNAME: ${{ secrets.ADDON_USERNAME }}
-#      if: always()
+      if: always() && contains(env, 'ADDON_PASSWORD') && contains(env, 'ADDON_USERNAME')
+    - name: Run addon using cli
+      run: coverage run -a tests/run.py /
+      env:
+        ADDON_PASSWORD: ${{ secrets.ADDON_PASSWORD }}
+        ADDON_USERNAME: ${{ secrets.ADDON_USERNAME }}
+      if: always() && contains(env, 'ADDON_PASSWORD') && contains(env, 'ADDON_USERNAME')
     - name: Upload code coverage to CodeCov
       uses: codecov/codecov-action@v1
       continue-on-error: true
