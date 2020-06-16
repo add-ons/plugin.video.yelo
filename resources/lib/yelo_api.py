@@ -182,19 +182,19 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
                         KodiWrapper.dialog_ok(title, message)
                     else:
                         resp = self.session.post(BASE_URL + "/device/authorize",
-                                                headers={
-                                                    "Content-Type": "application/json;charset=utf-8",
-                                                    "X-Yelo-DeviceId": device_id,
-                                                    "Authorization": authorization_payload(oauth_tokens["accessToken"])
-                                                },
-                                                data=device_authorize(device_id, "YeloPlay"))
+                                                 headers={
+                                                     "Content-Type": "application/json;charset=utf-8",
+                                                     "X-Yelo-DeviceId": device_id,
+                                                     "Authorization": authorization_payload(oauth_tokens["accessToken"])
+                                                 },
+                                                 data=device_authorize(device_id, "YeloPlay"))
                         resp = self.session.post(BASE_URL + "/stream/start",
-                                                headers={
-                                                    "Content-Type": "application/json;charset=utf-8",
-                                                    "X-Yelo-DeviceId": device_id,
-                                                    "Authorization": authorization_payload(oauth_tokens["accessToken"])
-                                                },
-                                                data=stream_payload(device_id, channel))
+                                                 headers={
+                                                     "Content-Type": "application/json;charset=utf-8",
+                                                     "X-Yelo-DeviceId": device_id,
+                                                     "Authorization": authorization_payload(oauth_tokens["accessToken"])
+                                                 },
+                                                 data=stream_payload(device_id, channel))
 
                 break
             except NotAuthorizedException:

@@ -91,17 +91,17 @@ def stream_payload(device_id, channel_id, protocol=PROTOCOLS.DASH):
 def device_authorize(device_id, alias):
     import json
     device = dict(
-        deviceAuthorizationRequest = dict(
-            customerAlias = dict(
-                aliasName = alias,
-                links = dict(
-                    device = device_id
+        deviceAuthorizationRequest=dict(
+            customerAlias=dict(
+                aliasName=alias,
+                links=dict(
+                    device=device_id
                 )
             ),
-            links = dict(
-                device = device_id
+            links=dict(
+                device=device_id
             ),
-            serviceClass = "YELO_CONTENT_STREAMING"
+            serviceClass="YELO_CONTENT_STREAMING"
         )
     )
     return json.dumps(device)
