@@ -88,6 +88,23 @@ def stream_payload(device_id, channel_id, protocol=PROTOCOLS.DASH):
     )
     return json.dumps(stream)
 
+def device_authorize(device_id, alias):
+    import json
+    device = dict(
+        deviceAuthorizationRequest=dict(
+            customerAlias=dict(
+                aliasName=alias,
+                links=dict(
+                    device=device_id
+                )
+            ),
+            links=dict(
+                device=device_id
+            ),
+            serviceClass="YELO_CONTENT_STREAMING"
+        )
+    )
+    return json.dumps(device)
 
 def widevine_payload_package(device_id, customer_id):
     import json

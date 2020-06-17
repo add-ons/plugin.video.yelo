@@ -9,7 +9,7 @@ import requests
 from data import USER_AGENT
 from helpers.helperclasses import Credentials
 from helpers.helpermethods import (authorization_payload, cache_to_file, create_token, device_payload, get_from_cache,
-                                   is_in_cache,
+                                   is_in_cache, device_authorize,
                                    login_payload, oauth_payload, oauth_refresh_token_payload, regex, stream_payload,
                                    timestamp_to_datetime)
 from kodiwrapper import KodiWrapper
@@ -172,6 +172,30 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
 
                 if resp.status_code == 401:
                     raise NotAuthorizedException("Unauthorized")
+                if resp.status_code == 403:
+                    response_data = resp.json()
+                    devices_registered = response_data["stream"]["authorizationResult"]["authorizedDevices"]
+                    devices_maximum = response_data["stream"]["authorizationResult"]["allowedDevices"]
+                    if devices_maximum - devices_registered == 0:
+                        title = "Telenet fout"
+                        message = "Geen toestellen meer beschikbaar"
+                        KodiWrapper.dialog_ok(title, message)
+                    else:
+                        resp = self.session.post(BASE_URL + "/device/authorize",
+                                                 headers={
+                                                     "Content-Type": "application/json;charset=utf-8",
+                                                     "X-Yelo-DeviceId": device_id,
+                                                     "Authorization": authorization_payload(oauth_tokens["accessToken"])
+                                                 },
+                                                 data=device_authorize(device_id, "YeloPlay"))
+                        resp = self.session.post(BASE_URL + "/stream/start",
+                                                 headers={
+                                                     "Content-Type": "application/json;charset=utf-8",
+                                                     "X-Yelo-DeviceId": device_id,
+                                                     "Authorization": authorization_payload(oauth_tokens["accessToken"])
+                                                 },
+                                                 data=stream_payload(device_id, channel))
+
                 break
             except NotAuthorizedException:
                 self._refresh_oauth_token()
