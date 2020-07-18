@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, unicode_literals
 import logging
 import routing
 
+from sys import argv
 from helpers.helperclasses import EPG
 from yelo_exceptions import YeloException
 from yelo import Yelo
@@ -19,18 +20,18 @@ yelo = Yelo()  # pylint: disable=invalid-name
 
 @plugin.route('/')
 def main_menu():
-    if EPG().is_enabled():
+    if EPG().is_enabled and EPG().is_cached:
         yelo.list_channels()
     else:
-        yelo.list_channels_no_epg()
+        yelo.list_channels_without_epg()
 
 
 @plugin.route('/play/id/<channel_id>')
 def play_id(channel_id):
     try:
         yelo.play(channel_id)
-    except YeloException as exc:
-        _LOGGER.error(exc)
+    except YeloException as e:
+        _LOGGER.error(e)
 
 
 @plugin.route('/iptv/channels')
@@ -49,3 +50,5 @@ def iptv_epg():
 
 def run(argv):
     plugin.run(argv)
+
+

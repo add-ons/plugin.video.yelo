@@ -53,15 +53,19 @@ class KodiWrapper():  # pylint: disable=no-init
         import addon
         return addon.plugin.url_for(getattr(addon, name), *args, **kwargs)
 
+    @staticmethod
+    def container_refresh():
+        xbmc.executebuiltin('Container.Refresh')
+
     @classmethod
     def add_dir_items(cls, listing):
         from addon import plugin
         xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
 
     @classmethod
-    def end_directory(cls):
+    def end_directory(cls, cache_to_disc=False):
         from addon import plugin
-        xbmcplugin.endOfDirectory(plugin.handle)
+        xbmcplugin.endOfDirectory(plugin.handle, cacheToDisc=cache_to_disc)
 
     @classmethod
     def sort_method(cls, sort_method):
@@ -71,3 +75,18 @@ class KodiWrapper():  # pylint: disable=no-init
     @classmethod
     def open_settings(cls):
         Addon().openSettings()
+
+    @classmethod
+    def get_setting(cls, name, default):
+        setting = Addon().getSetting(name)
+
+        if setting:
+            return setting
+
+        return default
+
+    @classmethod
+    def set_setting(cls, name, value):
+        Addon().setSetting(name, value)
+
+

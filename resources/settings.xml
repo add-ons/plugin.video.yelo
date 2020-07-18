@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
+    <setting id="metadata_last_updated" visible="false"/>
+
     <category label="32000">
         <setting label="32001" type="text" id="username" default=""/>
         <setting label="32002" type="text" id="password" default="" option="hidden"/>
     </category>
 
     <category label="31998">
-        <setting label="31999" type="bool" id="epg" default="false"/>
+        <setting label="31999" type="bool" id="epg" default="true"/>
+        <setting label="40000" type="action" action="RunScript(plugin.video.yelo, refresh_epg)"/>
     </category>
 
     <category label="30860">

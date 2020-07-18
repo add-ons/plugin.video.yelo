@@ -8,5 +8,9 @@ class NotAuthorizedException(Exception):
     pass
 
 
+class ForbiddenException(Exception):
+    pass
+
+
 class YeloException(Exception):
     pass

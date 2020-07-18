@@ -10,6 +10,7 @@
     <extension point="xbmc.python.pluginsource" library="resources/lib/addon_entry.py">
         <provides>video</provides>
     </extension>
+    <extension point="xbmc.service" library="resources/lib/yelo_bg_service.py"/>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Stream live streams from Yelo Play</summary>
         <description lang="en_GB">This plugin makes it possible to watch live streams that are available on the Telenet Yelo application for your region.</description>

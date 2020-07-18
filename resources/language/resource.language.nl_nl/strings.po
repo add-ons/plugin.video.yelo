@@ -86,7 +86,7 @@ msgstr "Je aanmeldgegevens moeten ingevuld worden in de add-on instellingen."
 
 msgctxt "#32016"
 msgid "Extra"
-msgstr "Extra"
+msgstr "InputStream Helper"
 
 msgctxt "#32017"
 msgid "InputStream Helper information"
@@ -99,3 +99,21 @@ msgstr "InputStream Adaptive instellingen"
 msgctxt "#32019"
 msgid "InputStream Helper settings"
 msgstr "InputStream Helper instellingen"
+
+msgctxt "#40000"
+msgid "Refresh EPG"
+msgstr "Refresh EPG"
+
+msgctxt "#40001"
+msgid "Info"
+msgstr "Info"
+
+msgctxt "#40002"
+msgid "EPG has been renewed"
+msgstr "EPG is vernieuwt"
+
+msgctxt "#40003"
+msgid "This can take a moment. Press OK to continue"
+msgstr "Dit kan even duren. Druk op OK om door te gaan"
+
+

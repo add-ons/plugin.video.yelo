@@ -4,8 +4,6 @@
 from __future__ import absolute_import, division, unicode_literals
 from data import PROTOCOLS
 
-CACHE_FILE_NAME = "data.json"
-
 
 def regex(query, url):
     import re
@@ -88,6 +86,7 @@ def stream_payload(device_id, channel_id, protocol=PROTOCOLS.DASH):
     )
     return json.dumps(stream)
 
+
 def device_authorize(device_id, alias):
     import json
     device = dict(
@@ -105,6 +104,7 @@ def device_authorize(device_id, alias):
         )
     )
     return json.dumps(device)
+
 
 def widevine_payload_package(device_id, customer_id):
     import json
@@ -133,56 +133,6 @@ def widevine_payload_package(device_id, customer_id):
 
 def authorization_payload(acces_token):
     return "Bearer {}".format(acces_token)
-
-
-def is_in_cache(key):
-    import json
-    import os
-    from kodiwrapper import KodiWrapper
-
-    path = KodiWrapper.get_addon_data_path()
-
-    if not os.path.isfile(os.path.join(path, CACHE_FILE_NAME)):
-        return False
-
-    with open(os.path.join(path, CACHE_FILE_NAME), "r") as json_file:
-        data = json.load(json_file)
-
-    return key in data
-
-
-def cache_to_file(json_data):
-    import json
-    import os
-    from kodiwrapper import KodiWrapper
-
-    path = KodiWrapper.get_addon_data_path()
-
-    if not os.path.exists(path):
-        os.mkdir(path, 0o775)
-
-    data = {}
-    if os.path.isfile(os.path.join(path, CACHE_FILE_NAME)):
-        with open(os.path.join(path, CACHE_FILE_NAME), "r") as json_file:
-            data = json.load(json_file)
-
-    data.update(json_data)
-
-    with open(os.path.join(path, CACHE_FILE_NAME), "w") as json_file:
-        json.dump(data, json_file)
-
-
-def get_from_cache(key):
-    import json
-    import os
-    from kodiwrapper import KodiWrapper
-
-    path = KodiWrapper.get_addon_data_path()
-
-    with open(os.path.join(path, CACHE_FILE_NAME), "r") as json_file:
-        data = json.load(json_file)
-
-    return data.get(key)
 
 
 def create_token(size):

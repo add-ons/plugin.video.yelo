@@ -85,7 +85,7 @@ msgid "You need to fill in your credentials in settings."
 msgstr ""
 
 msgctxt "#32016"
-msgid "Extra"
+msgid "InputStream Helper"
 msgstr ""
 
 msgctxt "#32017"
@@ -99,3 +99,22 @@ msgstr ""
 msgctxt "#32019"
 msgid "InputStream Helper settings"
 msgstr ""
+
+msgctxt "#40000"
+msgid "Refresh EPG"
+msgstr ""
+
+msgctxt "#40001"
+msgid "Info"
+msgstr ""
+
+msgctxt "#40002"
+msgid "EPG has been renewed"
+msgstr ""
+
+msgctxt "#40003"
+msgid "This can take a moment. Press OK to continue"
+msgstr ""
+
+
+

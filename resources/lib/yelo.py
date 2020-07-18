@@ -5,10 +5,12 @@ from __future__ import absolute_import, division, unicode_literals
 import inputstreamhelper
 import xbmcgui
 import xbmcplugin
+import logging
 
 from data import USER_AGENT
-from helpers.helpermethods import widevine_payload_package, get_from_cache
-from yelo_api import YeloApi
+from helpers.helperclasses import PluginCache
+from helpers.helpermethods import widevine_payload_package
+from yelo_api import YeloApi, YeloException
 
 try:  # Python 3
     from urllib.parse import quote
@@ -20,6 +22,8 @@ PROTOCOL = 'mpd'
 DRM = 'com.widevine.alpha'
 LICENSE_URL = 'https://lwvdrm.yelo.prd.telenet-ops.be/WvLicenseProxy'
 
+_LOGGER = logging.getLogger('plugin')
+
 
 class Yelo(YeloApi):
     def __init__(self):
@@ -27,8 +31,8 @@ class Yelo(YeloApi):
 
     def play(self, channel):
         manifest_url = self.get_manifest(channel)
-        device_id = get_from_cache("device_id")
-        customer_id = get_from_cache("entitlements")["customer_id"]
+        device_id = PluginCache.get_by_key("device_id")
+        customer_id = PluginCache.get_by_key("entitlements")["customer_id"]
 
         is_helper = inputstreamhelper.Helper(PROTOCOL, drm=DRM)
         if is_helper.check_inputstream():
@@ -50,7 +54,7 @@ class Yelo(YeloApi):
             play_item.setProperty('inputstream.adaptive.license_flags', "persistent_storage")
             xbmcplugin.setResolvedUrl(plugin.handle, True, listitem=play_item)
 
-    def list_channels_no_epg(self, is_folder=False):
+    def list_channels_without_epg(self, is_folder=False):
         from kodiwrapper import KodiWrapper
 
         listing = []
@@ -78,7 +82,7 @@ class Yelo(YeloApi):
         listing = []
 
         tv_channels = self.get_channels()
-        epg = self.get_epg(tv_channels, full=False)
+        epg = self.get_cached_epg()
 
         for tv_channel in tv_channels:
             name = tv_channel.get('channelIdentification').get('name')
@@ -112,7 +116,6 @@ class Yelo(YeloApi):
                 title = item.get('title', '')
                 guide = self._create_guide_from_channel_info(prev_title, title, next_title)
                 poster = item.get('image', '')
-                break
 
             list_item = KodiWrapper.create_list_item(name, square_logo, poster, {"plot": guide}, True, True)
             url = KodiWrapper.url_for('play_id', channel_id=channel_id)
