@@ -52,3 +52,7 @@ def run(argv):
     plugin.run(argv)
 
 
+@plugin.route('/epg/refresh')
+def epg_refresh():
+    from yelo_bg_service import refresh_epg
+    refresh_epg()
