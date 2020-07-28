@@ -2,15 +2,15 @@
 # GNU General Public License v3.0 (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, unicode_literals
+import logging
 import inputstreamhelper
 import xbmcgui
 import xbmcplugin
-import logging
 
 from data import USER_AGENT
 from helpers.helperclasses import PluginCache
 from helpers.helpermethods import widevine_payload_package
-from yelo_api import YeloApi, YeloException
+from yelo_api import YeloApi
 
 try:  # Python 3
     from urllib.parse import quote
@@ -26,9 +26,6 @@ _LOGGER = logging.getLogger('plugin')
 
 
 class Yelo(YeloApi):
-    def __init__(self):
-        super(Yelo, self).__init__()
-
     def play(self, channel):
         manifest_url = self.get_manifest(channel)
         device_id = PluginCache.get_by_key("device_id")

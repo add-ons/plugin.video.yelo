@@ -5,7 +5,6 @@ from __future__ import absolute_import, division, unicode_literals
 import logging
 import routing
 
-from sys import argv
 from helpers.helperclasses import EPG
 from yelo_exceptions import YeloException
 from yelo import Yelo
@@ -30,8 +29,8 @@ def main_menu():
 def play_id(channel_id):
     try:
         yelo.play(channel_id)
-    except YeloException as e:
-        _LOGGER.error(e)
+    except YeloException as exc:
+        _LOGGER.error(exc)
 
 
 @plugin.route('/iptv/channels')

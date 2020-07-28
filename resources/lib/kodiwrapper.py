@@ -88,5 +88,3 @@ class KodiWrapper():  # pylint: disable=no-init
     @classmethod
     def set_setting(cls, name, value):
         Addon().setSetting(name, value)
-
-

@@ -7,5 +7,4 @@ from addon import run
 
 
 if __name__ == '__main__':
-    function = argv[1]
     run(argv)

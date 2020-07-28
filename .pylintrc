@@ -6,6 +6,7 @@ disable=
     import-outside-toplevel,  # Done on purpose to reduce overhead at startup
     missing-docstring,  # TODO
     old-style-class,
+    super-with-arguments,
     too-few-public-methods,
     too-many-arguments,
     too-many-branches,
