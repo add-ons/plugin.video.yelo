@@ -254,7 +254,8 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
         if devices_maximum - devices_registered == 0:
             self._display_error_message(response_data)
         else:
-            return self._register_device()
+            device_id = PluginCache.get_by_key("device_id")
+            return self._device_authorize(device_id)
 
     def get_manifest(self, channel):
         start_stream_response = self._start_stream(channel)
