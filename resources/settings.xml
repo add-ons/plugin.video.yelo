@@ -9,7 +9,7 @@
 
     <category label="31998">
         <setting label="31999" type="bool" id="epg" default="true"/>
-        <setting label="40000" type="action" action="RunScript(plugin.video.yelo, refresh_epg)"/>
+        <setting label="40000" type="action" action="RunPlugin(plugin://plugin.video.yelo/epg/refresh)"/>
     </category>
 
     <category label="30860">

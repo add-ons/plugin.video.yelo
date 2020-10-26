@@ -47,6 +47,14 @@ class BackgroundService(Monitor):
             KodiWrapper.container_refresh()
 
 
+def refresh_epg():
+    KodiWrapper.dialog_ok(KodiWrapper.get_localized_string(40001),
+                          KodiWrapper.get_localized_string(40003))
+    BackgroundService.cache_channel_epg()
+    KodiWrapper.dialog_ok(KodiWrapper.get_localized_string(40001),
+                          KodiWrapper.get_localized_string(40002))
+
+
 def run():
     """ Run the BackgroundService """
     BackgroundService().run()

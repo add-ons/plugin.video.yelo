@@ -4,12 +4,13 @@
 from __future__ import absolute_import, division, unicode_literals
 import threading
 import time
-import requests
 import logging
+import requests
 
 from data import USER_AGENT
-from helpers.helpermethods import *
 from helpers.helperclasses import Credentials, EPG, PluginCache
+from helpers.helpermethods import (authorization_payload, create_token, device_authorize, device_payload, login_payload,
+                                   oauth_payload, oauth_refresh_token_payload, regex, stream_payload, timestamp_to_datetime)
 from kodiwrapper import KodiWrapper
 from yelo_exceptions import NotAuthorizedException, YeloException, ForbiddenException
 
@@ -28,15 +29,15 @@ VERIFY = False
 _LOGGER = logging.getLogger('plugin')
 
 
-class YeloErrors(object):  # pylint: disable=no-init
+class YeloErrors:  # pylint: disable=no-init
     # noinspection PyTypeChecker
     @classmethod
     def get_error_message(cls, errid):
         resp = requests.get("https://api.yeloplay.be/api/v1/masterdata?platform=Web&fields=errors", verify=VERIFY)
 
-        errors = resp.json()["masterData"]["errors"]
+        errors = resp.json().get('masterData').get('errors')
 
-        res = next((error for error in errors if error["id"] == errid), "")
+        res = next((error for error in errors if error.get('id') == errid), "")
 
         if not res:
             return None
@@ -44,7 +45,7 @@ class YeloErrors(object):  # pylint: disable=no-init
         return res["title"]["locales"]["en"], res["subtitle"]["locales"]["en"]
 
 
-class YeloApi(object):  # pylint: disable=useless-object-inheritance
+class YeloApi:  # pylint: disable=useless-object-inheritance
     session = requests.Session()
     session.verify = VERIFY
     session.headers['User-Agent'] = USER_AGENT
@@ -131,7 +132,7 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
                 KodiWrapper.open_settings()
                 self._execute_required_steps()
 
-            return False
+        return False
 
     def _device_authorize(self, device_id):
         oauth_tokens = PluginCache.get_by_key("OAuthTokens")
@@ -157,9 +158,9 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
             json_data = resp.json()
             device_id = json_data.get('deviceRegistration').get('id')
             PluginCache.set_data({"device_id": device_id})
-            return resp
-        except (ValueError, KeyError) as e:
-            _LOGGER.error(e)
+        except (ValueError, KeyError) as exc:
+            _LOGGER.error(exc)
+        return resp
 
     def _request_oauth_tokens(self):
         auth_token = PluginCache.get_by_key("auth_token")
@@ -179,8 +180,8 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
 
             if oauth_data and oauth_data.get('status').upper() == 'SUCCESS':
                 PluginCache.set_data({"OAuthTokens": oauth_data})
-        except (ValueError, KeyError) as e:
-            _LOGGER.error(e)
+        except (ValueError, KeyError) as exc:
+            _LOGGER.error(exc)
 
     def _refresh_oauth_token(self):
         device_id = PluginCache.get_by_key("device_id")
@@ -200,8 +201,8 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
 
             if oauth_data and oauth_data.get('status') == "SUCCESS":
                 PluginCache.set_data({"OAuthTokens": oauth_data})
-        except (ValueError, KeyError) as e:
-            _LOGGER.error(e)
+        except (ValueError, KeyError) as exc:
+            _LOGGER.error(exc)
 
     def _start_stream(self, channel):
         response_data = None
@@ -225,48 +226,50 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
 
                 try:
                     response_data = response.json()
-                except ValueError as e:
-                    _LOGGER.error(e)
+                except ValueError as exc:
+                    _LOGGER.error(exc)
 
                 current_iteration += 1
 
                 if response.status_code == 401:
                     raise NotAuthorizedException("Unauthorized")
-                elif response.status_code == 403:
+                if response.status_code == 403:
                     raise ForbiddenException("Forbidden")
                 break
             except NotAuthorizedException:
                 self._refresh_oauth_token()
             except ForbiddenException:
-                if "stream" in response_data:
-                    stream = response_data["stream"]
-                    if "authorizationResult" in stream and stream["authorizationResult"]["resultCode"].upper() \
-                            == "DEVICE_AUTHORIZATION_REQUIRED":
-                        self._check_registered_devices(response_data)
-                else:
+                stream = response_data.get('stream')
+                if stream is None:
                     self._display_error_message(response_data)
                     return None
+                if stream.get('authorizationResult') is None or stream.get('authorizationResult').get('resultCode').upper() != "DEVICE_AUTHORIZATION_REQUIRED":
+                    self._display_error_message(response_data)
+                    return None
+                self._check_registered_devices(response_data)
         return response_data
 
     def _check_registered_devices(self, response_data):
         devices_registered = response_data["stream"]["authorizationResult"]["authorizedDevices"]
         devices_maximum = response_data["stream"]["authorizationResult"]["allowedDevices"]
+
         if devices_maximum - devices_registered == 0:
             self._display_error_message(response_data)
-        else:
-            device_id = PluginCache.get_by_key("device_id")
-            return self._device_authorize(device_id)
+            return self._register_device()
+
+        device_id = PluginCache.get_by_key("device_id")
+        return self._device_authorize(device_id)
 
     def get_manifest(self, channel):
         start_stream_response = self._start_stream(channel)
 
-        if start_stream_response:
-            stream = start_stream_response.get('stream')
-            stream_desc = stream.get('streamDescriptor')
-            manifest = stream_desc.get('manifest')
-            return manifest
-        else:
+        if not start_stream_response:
             raise YeloException("Start stream returned an empty response.")
+
+        stream = start_stream_response.get('stream')
+        stream_desc = stream.get('streamDescriptor')
+        manifest = stream_desc.get('manifest')
+        return manifest
 
     def _get_entitlements(self):
         if not PluginCache.get_by_key("entitlements"):
@@ -280,8 +283,8 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
                 PluginCache.set_data({"entitlements": {
                     "entitlementId": entitlements,
                     "customer_id": customer_id}})
-            except (ValueError, KeyError) as e:
-                _LOGGER.error(e)
+            except (ValueError, KeyError) as exc:
+                _LOGGER.error(exc)
 
         return PluginCache.get_by_key("entitlements")
 
@@ -315,8 +318,8 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
             tv_channels = json_data["serviceCatalog"]["tvChannels"]
             allowed_tv_channels = cls._get_entitled_channels(tv_channels)
             return allowed_tv_channels
-        except (ValueError, KeyError) as e:
-            _LOGGER.error(e)
+        except (ValueError, KeyError) as exc:
+            _LOGGER.error(exc)
 
         return []
 
@@ -382,8 +385,8 @@ class YeloApi(object):  # pylint: disable=useless-object-inheritance
 
             time.sleep(0.01)
             SEMAPHORE.release()
-        except (ValueError, KeyError) as e:
-            _LOGGER.error(e)
+        except (ValueError, KeyError) as exc:
+            _LOGGER.error(exc)
 
     @classmethod
     def _epg(cls, tv_channels):

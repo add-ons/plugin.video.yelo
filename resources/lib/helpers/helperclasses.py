@@ -81,7 +81,7 @@ class EPG:
         self.epg = Addon().getSetting('epg')
 
 
-class PluginCache:
+class PluginCache:  # pylint: disable=no-init
     CACHE_FILE_NAME = "data.json"
 
     @classmethod
@@ -133,5 +133,3 @@ class PluginCache:
             data = json.load(json_file)
 
         return data.get(key)
-
-
