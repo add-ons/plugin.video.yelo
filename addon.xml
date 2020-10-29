@@ -28,8 +28,8 @@
         <email>shycoderX@protonmail.com</email>
         <source>https://github.com/add-ons/plugin.video.yelo</source>
         <assets>
-            <icon>resources/icon.png</icon>
-            <fanart>resources/fanart.jpg</fanart>
+            <icon>resources/media/icon.png</icon>
+            <fanart>resources/media/fanart.jpg</fanart>
         </assets>
     </extension>
 </addon>
