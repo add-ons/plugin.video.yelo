@@ -37,7 +37,7 @@ class Yelo(YeloApi):
             play_item = xbmcgui.ListItem(path=manifest_url)
             play_item.setMimeType('application/xml+dash')
             play_item.setContentLookup(False)
-            play_item.setProperty('inputstreamaddon', is_helper.inputstream_addon)
+            play_item.setProperty('inputstream', is_helper.inputstream_addon)
             play_item.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
             play_item.setProperty('inputstream.adaptive.license_type', DRM)
             play_item.setProperty('inputstream.adaptive.manifest_update_parameter', 'full')
