@@ -57,3 +57,35 @@ This project is released under the GNU GPL license, you can read the LICENSE on 
 # Thanks #
 Big thanks to [peak3d](https://github.com/peak3d) for his plugin and all the support!
 also to [basrieter](https://bitbucket.org/basrieter/xbmc-online-tv/src/master/) for helping to debug my plugin!
+
+# Changelog #
+
+### v1.0.1 (2020-11-02)
+- Load EPG in the background (@shycoderX)
+- Add device registration for Play subscription (@fripsy)
+- Use sock.sendall instead of sock.send (@michaelarnauts)
+
+### v1.0.0 (2020-05-22)
+- Add Dutch translations (@dagwieers)
+- Add support for IPTV Manager (@shycoderX, @dagwieers)
+
+### v0.0.9 (2019-12-24)
+- Updates (@shycoderX)
+
+### v0.0.8 (2019-11-23)
+- Updates (@shycoderX)
+
+### v0.0.7 (2019-11-15)
+- Updates (@shycoderX)
+
+### v0.0.6 (2019-11-13)
+- Updates (@shycoderX)
+
+### v0.0.5 (2019-10-06)
+- Updates (@shycoderX)
+
+### v0.0.3 (2019-02-18)
+- Updates (@shycoderX)
+
+### v0.0.2 (2019-02-13)
+Initial public release (@shycoderX)
