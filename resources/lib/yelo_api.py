@@ -24,7 +24,7 @@ CALLBACK_URL = "https://www.yeloplay.be/openid/callback"
 
 MAXTHREADS = 5
 SEMAPHORE = threading.Semaphore(value=MAXTHREADS)
-VERIFY = False
+VERIFY = True
 
 _LOGGER = logging.getLogger('plugin')
 

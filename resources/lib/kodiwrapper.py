@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, unicode_literals
 import sys
 from xbmcaddon import Addon
 import xbmc
+import xbmcvfs
 import xbmcgui
 import xbmcplugin
 
@@ -13,7 +14,10 @@ class KodiWrapper():  # pylint: disable=no-init
     @classmethod
     def get_addon_data_path(cls):
         if sys.version_info[0] == 3:
-            profile = xbmc.translatePath(Addon().getAddonInfo('profile'))
+            try:
+                profile = xbmcvfs.translatePath(Addon().getAddonInfo('profile'))
+            except AttributeError:
+                profile = xbmc.translatePath(Addon().getAddonInfo('profile'))
         else:
             profile = xbmc.translatePath(Addon().getAddonInfo('profile')).decode("utf-8")
         return profile
