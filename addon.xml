@@ -34,6 +34,7 @@
         </assets>
         <news>
 v1.0.1 (2020-11-02)
+- Add Kodi 19 checks @shycoderX)
 - Load EPG in the background (@shycoderX)
 - Add device registration for Play subscription (@fripsy)
 - Use sock.sendall instead of sock.send (@michaelarnauts)
