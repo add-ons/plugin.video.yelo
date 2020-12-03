@@ -62,6 +62,15 @@ build: clean
 	cd ..; zip -r $(zip_name) $(include_paths) -x $(exclude_files)
 	@echo -e "$(white)=$(blue) Successfully wrote package as: $(white)../$(zip_name)$(reset)"
 
+multizip: clean
+@-$(foreach abi,$(KODI_PYTHON_ABIS), \
+	echo "cd /addon/requires/import[@addon='xbmc.python']/@version\nset $(abi)\nsave\nbye" | xmllint --shell addon.xml; \
+	matrix=$(findstring $(abi), $(word 1,$(KODI_PYTHON_ABIS))); \
+	if [ $$matrix ]; then version=$(version)+matrix.1; else version=$(version); fi; \
+	echo "cd /addon/@version\nset $$version\nsave\nbye" | xmllint --shell addon.xml; \
+	make build; \
+)
+
 clean:
 	@echo -e "$(white)=$(blue) Cleaning up$(reset)"
 	find . -name '*.py[cod]' -type f -delete
