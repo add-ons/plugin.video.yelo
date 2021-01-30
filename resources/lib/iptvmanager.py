@@ -9,6 +9,7 @@ import json
 
 _LOGGER = logging.getLogger('iptv-manager')
 
+
 class IPTVManager:
     """Interface to IPTV Manager"""
 
