@@ -26,7 +26,7 @@ class IPTVManager:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect(('127.0.0.1', self.port))
             try:
-                sock.sendall(json.dumps(func(self)))  # pylint: disable=not-callable
+                sock.sendall(json.dumps(func(self)).encode())  # pylint: disable=not-callable
             finally:
                 sock.close()
 
