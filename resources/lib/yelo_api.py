@@ -52,7 +52,8 @@ class YeloApi:  # pylint: disable=useless-object-inheritance
     session.verify = VERIFY
     session.headers['User-Agent'] = USER_AGENT
 
-    def __init__(self):
+    def __init__(self, interactive=True):
+        self.interactive = interactive
         self.auth_tries = 0
         if not self.oauth_in_cache:
             self._execute_required_steps()
@@ -107,8 +108,11 @@ class YeloApi:  # pylint: disable=useless-object-inheritance
         creds = Credentials()
 
         if not creds.are_filled_in():
-            KodiWrapper.dialog_ok(KodiWrapper.get_localized_string(32014),
-                                  KodiWrapper.get_localized_string(32015))
+            if not self.interactive:
+                raise NotAuthorizedException  # Do not ask for credentials when non-interactive, just fail
+
+            KodiWrapper.dialog_ok(KodiWrapper.get_localized_string(32014),  # Login
+                                  KodiWrapper.get_localized_string(32015))  # Fill in your credentials
             KodiWrapper.open_settings()
             creds.reload()
 
@@ -127,8 +131,11 @@ class YeloApi:  # pylint: disable=useless-object-inheritance
                 PluginCache.set_data({"auth_token": token})
                 return True
         except NotAuthorizedException:
-            KodiWrapper.dialog_ok(KodiWrapper.get_localized_string(32006),
-                                  KodiWrapper.get_localized_string(32007))
+            if not self.interactive:
+                raise  # Do not ask to check credentials when non-interactive, just fail
+
+            KodiWrapper.dialog_ok(KodiWrapper.get_localized_string(32006),  # Login failed
+                                  KodiWrapper.get_localized_string(32007))  # Check your login details
 
             if self.auth_tries < 2:
                 KodiWrapper.open_settings()
