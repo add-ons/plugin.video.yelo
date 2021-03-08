@@ -49,11 +49,11 @@ class BackgroundService(Monitor):
 
 
 def refresh_epg():
-    KodiWrapper.dialog_ok(KodiWrapper.get_localized_string(40001),
-                          KodiWrapper.get_localized_string(40003))
+    KodiWrapper.dialog_ok(KodiWrapper.get_localized_string(40001),  # Info
+                          KodiWrapper.get_localized_string(40003))  # This can take a while
     BackgroundService.cache_channel_epg()
-    KodiWrapper.dialog_ok(KodiWrapper.get_localized_string(40001),
-                          KodiWrapper.get_localized_string(40002))
+    KodiWrapper.dialog_ok(KodiWrapper.get_localized_string(40001),  # Info
+                          KodiWrapper.get_localized_string(40002))  # EPG has been renewed
 
 
 def run():

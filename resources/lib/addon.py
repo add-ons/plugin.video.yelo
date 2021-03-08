@@ -5,30 +5,27 @@ from __future__ import absolute_import, division, unicode_literals
 import logging
 import routing
 
-from helpers.helperclasses import EPG
-from yelo_exceptions import YeloException
-from yelo import Yelo
-
 logging.basicConfig()
 _LOGGER = logging.getLogger('plugin')
 plugin = routing.Plugin()  # pylint: disable=invalid-name
 
-# instantiate yelo object
-yelo = Yelo()  # pylint: disable=invalid-name
-
 
 @plugin.route('/')
 def main_menu():
+    from helpers.helperclasses import EPG
+    from yelo import Yelo
     if EPG().is_enabled and EPG().is_cached:
-        yelo.list_channels()
+        Yelo().list_channels()
     else:
-        yelo.list_channels_without_epg()
+        Yelo().list_channels_without_epg()
 
 
 @plugin.route('/play/id/<channel_id>')
 def play_id(channel_id):
+    from yelo import Yelo
+    from yelo_exceptions import YeloException
     try:
-        yelo.play(channel_id)
+        Yelo().play(channel_id)
     except YeloException as exc:
         _LOGGER.error(exc)
 
@@ -37,14 +34,14 @@ def play_id(channel_id):
 def iptv_channels():
     from iptvmanager import IPTVManager
     port = int(plugin.args['port'][0])
-    IPTVManager(port, yelo).send_channels()
+    IPTVManager(port).send_channels()
 
 
 @plugin.route('/iptv/epg')
 def iptv_epg():
     from iptvmanager import IPTVManager
     port = int(plugin.args['port'][0])
-    IPTVManager(port, yelo).send_epg()
+    IPTVManager(port).send_epg()
 
 
 def run(argv):

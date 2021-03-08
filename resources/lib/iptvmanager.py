@@ -6,6 +6,7 @@ from __future__ import absolute_import, division, unicode_literals
 import logging
 import socket
 import json
+from yelo import Yelo
 
 _LOGGER = logging.getLogger('iptv-manager')
 
@@ -13,10 +14,10 @@ _LOGGER = logging.getLogger('iptv-manager')
 class IPTVManager:
     """Interface to IPTV Manager"""
 
-    def __init__(self, port, yelo):
+    def __init__(self, port):
         """Initialize IPTV Manager object"""
         self.port = port
-        self.yelo = yelo
+        self.yelo = Yelo(interactive=False)
 
     def via_socket(func):  # pylint: disable=no-self-argument
         """Send the output of the wrapped function to socket"""
