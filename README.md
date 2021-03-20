@@ -59,6 +59,9 @@ Big thanks to [peak3d](https://github.com/peak3d) for his plugin and all the sup
 also to [basrieter](https://bitbucket.org/basrieter/xbmc-online-tv/src/master/) for helping to debug my plugin!
 
 # Changelog #
+### v1.0.3 (2021-03-20)
+- Ensure no windows are shown when non-interactive (@dagwieers)
+
 ### v1.0.2 (2021-03-04)
 - Fix an exception on Matrix when using IPTV Manager (@dagwieers)
 
