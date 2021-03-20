@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.yelo" name="Yelo" version="1.0.2" provider-name="shycoderX">
+<addon id="plugin.video.yelo" name="Yelo" version="1.0.3" provider-name="shycoderX">
     <requires>
         <import addon="xbmc.python" version="2.26.0"/>
         <import addon="script.module.dateutil" version="2.4.2"/>
@@ -32,18 +32,21 @@
             <fanart>resources/fanart.jpg</fanart>
         </assets>
         <news>
+v1.0.3 (2021-03-20)
+- Ensure no windows are shown when non-interactive
+
 v1.0.2 (2021-03-04)
-- Fix an exception on Matrix when using IPTV Manager (@dagwieers)
+- Fix an exception on Matrix when using IPTV Manager
 
 v1.0.1 (2020-11-02)
-- Add Kodi 19 checks @shycoderX)
-- Load EPG in the background (@shycoderX)
-- Add device registration for Play subscription (@fripsy)
-- Use sock.sendall instead of sock.send (@michaelarnauts)
+- Add Kodi 19 checks
+- Load EPG in the background
+- Add device registration for Play subscription
+- Use sock.sendall instead of sock.send
 
-### v1.0.0 (2020-05-22)
-- Add Dutch translations (@dagwieers)
-- Add support for IPTV Manager (@shycoderX, @dagwieers)
+v1.0.0 (2020-05-22)
+- Add Dutch translations
+- Add support for IPTV Manager
         </news>
     </extension>
 </addon>
